@@ -4,7 +4,6 @@ import pandas as pd
 import subprocess
 import matplotlib.pyplot as plt
 
-
 COLUMN_DESCRIPTIONS = {
     'queueLength': "Number of requests waiting in the system queue.",
     'latencyRead': "Time taken to read data (in milliseconds).",
@@ -29,6 +28,7 @@ def calculate_statistics(df):
             }
     return stats
 
+
 def format_stats(stats):
     text = ""
     for col, metrics in stats.items():
@@ -37,25 +37,33 @@ def format_stats(stats):
             text += f"  - {stat}: {value:.2f}\n"
     return text
 
-def generate_prompt(df, stats):
-    column_description_text = "\n".join([f"- **{col}**: {desc}" for col, desc in COLUMN_DESCRIPTIONS.items() if col in df.columns])
-    stats_text = format_stats(stats)
-    prompt = f"""
-You are analyzing weekly system performance metrics.
 
-Below are the column descriptions:
+def generate_prompt(df, stats):
+    column_description_text = "\n".join([
+        f"- **{col}**: {desc}" for col, desc in COLUMN_DESCRIPTIONS.items() if col in df.columns
+    ])
+    stats_text = format_stats(stats)
+
+    prompt = f"""
+You are a system performance analyst.
+
+Below are column descriptions for the data:
 {column_description_text}
 
-Here are the computed statistics from the dataset:
+Here are key computed statistics from the data:
 {stats_text}
 
-Based on the above information, summarize the key system behaviors, trends, bottlenecks, and any observations related to performance or anomalies.
+Strictly based on the above information:
+- Summarize patterns, bottlenecks, or anomalies in 5 to 7 sentences.
+- Do NOT assume anything beyond the data.
+- Be objective, concise, and data-driven.
 """
-    return prompt
+    return prompt.strip()
 
 
 def clean_filename(text):
     return re.sub(r'[^\w\-_.]', '_', text)
+
 
 def plot_metrics(df, csv_name):
     base_name = os.path.splitext(os.path.basename(csv_name))[0]
@@ -80,17 +88,11 @@ def plot_metrics(df, csv_name):
 
 
 def generate_summary(csv_file, output_txt):
-    df = pd.read_csv(csv_file)
-    df = df.dropna()
-    df = df.head(100)  
-
+    df = pd.read_csv(csv_file).dropna().head(100)
     stats = calculate_statistics(df)
     prompt = generate_prompt(df, stats)
-
-   
     plot_metrics(df, csv_file)
 
-    
     result = subprocess.run(
         ['ollama', 'run', 'mistral'],
         input=prompt.encode('utf-8'),
@@ -101,44 +103,52 @@ def generate_summary(csv_file, output_txt):
         print(f" Error while running ollama for {csv_file}")
         print(result.stderr.decode('utf-8'))
     else:
-        summary = result.stdout.decode('utf-8')
+        summary = result.stdout.decode('utf-8').strip()
         with open(output_txt, 'w', encoding='utf-8') as f:
             f.write(summary)
         print(f" Summary written to {output_txt}")
-
 
 def compare_summaries(summary_files, output_file):
     comparisons = []
     for i in range(len(summary_files) - 1):
         with open(summary_files[i], 'r', encoding='utf-8') as f1, open(summary_files[i+1], 'r', encoding='utf-8') as f2:
-            summary1 = f1.read()
-            summary2 = f2.read()
+            summary1 = f1.read().strip()
+            summary2 = f2.read().strip()
 
             prompt = f"""
 You are a system performance analyst. Below are two weekly summaries of system metrics.
 
-Compare Week {i+1} and Week {i+2}, and explain the key differences in trends, anomalies, or improvements.
+Compare Week {i+1} and Week {i+2}:
+- Focus only on actual differences in trends or anomalies.
+- Do not repeat similar parts.
+- Be precise and analytical.
 
 --- Week {i+1} Summary ---
 {summary1}
 
 --- Week {i+2} Summary ---
 {summary2}
-"""
+""".strip()
+
             result = subprocess.run(
-                ['ollama', 'run', 'mistral'],
+                ['ollama', 'run', 'mistral'],  
                 input=prompt.encode('utf-8'),
                 capture_output=True
             )
 
-            comparison_text = result.stdout.decode('utf-8')
+            if result.returncode != 0:
+                print(f" Error comparing summaries for Week {i+1} and Week {i+2}")
+                print(result.stderr.decode('utf-8'))
+                continue
+
+            comparison_text = result.stdout.decode('utf-8').strip()
             comparisons.append(f"\n🔍 Week {i+1} vs Week {i+2}:\n{comparison_text}\n{'-'*80}\n")
 
     with open(output_file, 'w', encoding='utf-8') as f:
         f.writelines(comparisons)
     print(f" Differences saved to {output_file}")
 
-
+# Main runner
 if __name__ == "__main__":
     os.makedirs('summaries', exist_ok=True)
     os.makedirs('comparisons', exist_ok=True)

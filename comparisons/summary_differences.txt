@@ -1,50 +1,40 @@
 
 🔍 Week 1 vs Week 2:
- Comparing Week 1 and Week 2, we can see some key differences in system trends, particularly with latency, IOPS, throughput, and queue length metrics. Here's a summary of the changes:
+In Week 2, there is a more pronounced imbalance between read and write operations compared to Week 1. The latency for read operations is significantly higher than write operations, indicating a possible bottleneck in read-heavy workloads. Additionally, both IOPS and throughput for read operations are much higher than their write counterparts, suggesting an increased emphasis on reading data. This could potentially lead to performance issues due to the system operating near its maximum capacity, as indicated by the mean queue length of 37.95.
 
-1. **Latency:** The mean read latency decreased slightly from 0.88 ms to 0.79 ms between Week 1 and Week 2, but write latency remained relatively stable at 0.37 ms for both weeks. This indicates that read operations have become more efficient in Week 2 compared to Week 1, while write operations had consistent performance.
+Another notable difference is the consistency in latency response times, with lower standard deviations observed in Week 2 compared to Week 1 for all latency measurements. However, the higher standard deviation for throughput readValue suggests variability in transfer rates of read operations. This could indicate intermittent performance issues or resource contention during read operations, which may require further investigation.
 
-2. **IOPS:** Read IOPS increased significantly from 56944.08 to 70482.86, indicating a higher number of read operations per second in Week 2 compared to Week 1. Write IOPS slightly decreased from 31226.92 to 26049.43, suggesting fewer write operations per second in Week 2 compared to Week 1.
-
-3. **Throughput:** Read throughput increased substantially from 928578.25 KiB/s to 1177448.75 KiB/s, indicating larger read transfers in Week 2 compared to Week 1. Write throughput remained relatively stable at around 660KiB/s for both weeks.
-
-4. **Queue Length:** The mean queue length decreased slightly from 39.76 to 37.95, indicating a reduction in the number of queued requests between Week 1 and Week 2. This suggests that the system is handling more requests effectively without significant congestion issues.
-
-Overall, the system in Week 2 exhibits consistently low latency for read and write operations, with higher IOPS and throughput for read operations compared to Week 1. The queue length remains relatively stable but has decreased slightly, suggesting efficient handling of requests at the storage layer. It is recommended to continue monitoring these metrics closely to identify any potential performance degradations or unexpected patterns over time.
-
-
+In summary, Week 2 data shows a more significant imbalance between read and write operations, with higher latency and throughput for read operations compared to Week 1. The increased queue length also suggests potential performance issues due to the system operating near its maximum capacity. Further analysis is recommended to identify long-term trends, patterns, and any potential causes of performance variations in read operations.
 --------------------------------------------------------------------------------
 
 🔍 Week 2 vs Week 3:
- By comparing Week 2 and Week 3 summaries, it is evident that there are some differences in trends and anomalies in system metrics:
+Week 3 shows a continuation of some trends observed in Week 2, with certain metrics worsening or exhibiting more pronounced differences between read and write operations:
 
-1. **Latency**: The write latency improved slightly from 0.37ms (Week 2) to 0.36ms (Week 3), but the read latency remained constant at 0.79ms. This could indicate that write operations are becoming more efficient, while read operations continue to be resource-intensive.
+1. The latency for read operations (0.79 ms mean) remains significantly higher than that of write operations (0.36 ms mean), indicating a potential bottleneck in read-heavy workloads, as observed in Week 2.
 
-2. **IOPS and Throughput**: Both read IOPS (70318.86) and throughput (1220993.28 KiB/s) increased slightly from Week 2 values (70482.86, 1177448.75KiB/s for IOPS; 1200993.28KiB/s, 662223.74KiB/s for throughput), while write IOPS (26210.00) and throughput (681273.32 KiB/s) remained relatively stable. This suggests a heavier read workload in Week 3 compared to Week 2, which may affect the efficiency of certain workloads.
+2. Both IOPS for read operations (70318.86 IOPS mean) and throughput for read operations (1220993.28 KiB/s mean) are significantly higher than their write counterparts (26210.00 IOPS mean, 681273.32 KiB/s mean), suggesting an even more pronounced imbalance in write and read operations, as compared to Week 2.
 
-3. **Queue Length**: The queue length increased from 37.95 (Week 2) to 38.43 (Week 3), indicating moderate queueing delay and possible congestion issues during certain periods in Week 3. This may be due to the higher I/O load or other system bottlenecks that were not present in Week 2.
+3. The standard deviations for latency measurements show a slight increase for both read (0.15 ms) and write operations (0.01 ms), but the larger increase is observed in the standard deviation of throughput readValue (107723.36 KiB/s).
 
-4. **Anomalies**: No major anomalies are evident from the data, but it's important to note that the increased queue length in Week 3 and the imbalance between read and write operations could potentially lead to performance degradation if left unaddressed.
+4. The queue length value has a slightly higher mean (38.43) and median (38.61), compared to Week 2, suggesting that the storage system may be operating near or even closer to its maximum capacity, potentially leading to increased latencies and reduced throughput during peak workloads.
 
-In summary, while some improvements were made in write latency, read operations continue to be resource-intensive and have a higher volume compared to writes in Week 3. Additionally, there is a potential bottleneck in handling read data, as indicated by the increased queue length and imbalance between IOPS and throughput for reads versus writes. Monitoring these metrics closely and investigating their causes can help maintain consistent performance and identify potential areas for optimization.
+5. In Week 3, there is a noticeable difference between the standard deviation of writeValue throughput (24010.47 KiB/s) and readValue throughput (107723.36 KiB/s), which was not as pronounced in Week 2.
 
+6. In Week 3, no anomalies were found in write operations, but the relatively low max value (0.37 ms) for write latency remains an area of potential improvement in write operations.
 
+In light of these findings from both Week 2 and Week 3 summaries, it appears that addressing potential bottlenecks related to read operations and possibly reducing the number of read requests could help improve overall system performance. Optimizing read operations, such as implementing caching strategies or fine-tuning read query optimization, may be beneficial for improving consistency in read performance and reducing latencies. Additionally, investigating possible causes behind the higher queue length values could provide insight into potential bottlenecks or congestion points that need to be addressed.
 --------------------------------------------------------------------------------
 
 🔍 Week 3 vs Week 4:
- Comparing Week 3 and Week 4 based on the provided summaries, we observe some key differences:
+Week 4 shows an increase in latency for both read (0.74 ms to 0.79 ms in Week 3) and write operations (0.37 ms to 0.36 ms in Week 3), with a more significant rise in the latency of read operations compared to writes. This suggests that the potential bottlenecks in the reading process have worsened.
 
-1. **Data Quality**: Week 4 has missing values (nan) for all computed statistics, which suggests either an incomplete dataset or an issue with data collection/processing. In contrast, Week 3's data is complete and stable.
+In terms of IOPS, the gap between read and write operations has widened from Week 3 to Week 4, with a higher mean for reads (78484.14 vs 70318.86) and a lower mean for writes (28153.00 vs 26210.00). This indicates that the higher volume or prioritization of read operations over write operations persists, but has intensified.
 
-2. **Trend Analysis**: Due to the missing values in Week 4, it is not possible to determine any trends in system performance over time. This includes latency, throughput, IOPS, queue length, etc., which were all analyzed in Week 3.
+Throughput values have also increased from Week 3 to Week 4 for both read and write operations (read: 1278680.14 KiB/s vs 1220993.28 KiB/s; write: 691009.94 KiB/s vs 681273.32 KiB/s). However, the standard deviation for writes has increased (28112.74) compared to Week 3, suggesting less consistency in write data transfer rates.
 
-3. **Potential Bottlenecks**: Based on the computed statistics from Week 3, we identified a potential bottleneck related to high read latency and an imbalance between read and write operations. However, without the corresponding data for Week 4, it is not possible to determine if these issues persist or have been addressed.
+The queue length mean value remains relatively steady at around 40, but the maximum value of 43.32 in Week 4 suggests occasional queuing delays that may contribute to latency or throughput issues.
 
-4. **Performance Observations**: Since Week 4 data is incomplete, no performance observations can be made from this summary compared to Week 3, where a balanced workload and good responsiveness were noted.
+In Week 4, an anomaly is observed in read operations where the maximum latency (0.94 ms) and max Throughput (1447237.11 KiB/s) are higher than their respective means. This indicates occasional spikes or inconsistencies in performance for reads that were not present or less pronounced in Week 3.
 
-5. **Data Quality Concerns**: The missing values in Week 4 indicate potential issues with the accuracy and reliability of the data, which could impact any analysis performed on it. Data quality concerns do not appear to exist for Week 3 based on the provided summary.
-
-In conclusion, while both weeks show potential bottlenecks in system performance, Week 3 provides valuable insights due to its complete dataset and computable statistics. It is crucial to address data collection/processing issues in Week 4 to ensure accurate performance analysis going forward.
-
-
+In summary, the data suggests that potential bottlenecks related to read operations have worsened, with significantly higher latency, IOPS, and throughput compared to writes, occasional inconsistencies in read performance, and high queue length values persisting from Week 3. It is recommended to further investigate read operations, consider the observed queue lengths, occasional write throughput fluctuations, and address the spikes or inconsistencies in read performance.
 --------------------------------------------------------------------------------
