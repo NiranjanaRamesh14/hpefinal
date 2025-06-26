@@ -4,7 +4,7 @@ import pandas as pd
 import subprocess
 import matplotlib.pyplot as plt
 
-# Dictionary to explain metrics to the model
+
 COLUMN_DESCRIPTIONS = {
     'queueLength': "Number of requests waiting in the system queue.",
     'latencyRead': "Time taken to read data (in milliseconds).",
@@ -15,7 +15,7 @@ COLUMN_DESCRIPTIONS = {
     'throughputWrite': "Amount of data written per second (in MB/s)."
 }
 
-# STEP 0: Calculate statistical summaries
+
 def calculate_statistics(df):
     stats = {}
     for col in df.columns:
@@ -53,7 +53,7 @@ Based on the above information, summarize the key system behaviors, trends, bott
 """
     return prompt
 
-# STEP 1A: Plot line graphs for each numeric column (saved only)
+
 def clean_filename(text):
     return re.sub(r'[^\w\-_.]', '_', text)
 
@@ -78,19 +78,19 @@ def plot_metrics(df, csv_name):
             print(f" Saved plot: {filename}")
             plt.close()
 
-# STEP 1B: Generate summary using Ollama
+
 def generate_summary(csv_file, output_txt):
     df = pd.read_csv(csv_file)
     df = df.dropna()
-    df = df.head(100)  # Limit to 100 rows for prompt size
+    df = df.head(100)  
 
     stats = calculate_statistics(df)
     prompt = generate_prompt(df, stats)
 
-    # Save line plots
+   
     plot_metrics(df, csv_file)
 
-    # Generate summary using Mistral
+    
     result = subprocess.run(
         ['ollama', 'run', 'mistral'],
         input=prompt.encode('utf-8'),
@@ -106,7 +106,7 @@ def generate_summary(csv_file, output_txt):
             f.write(summary)
         print(f" Summary written to {output_txt}")
 
-# STEP 2: Compare week summaries and save differences
+
 def compare_summaries(summary_files, output_file):
     comparisons = []
     for i in range(len(summary_files) - 1):
@@ -138,7 +138,7 @@ Compare Week {i+1} and Week {i+2}, and explain the key differences in trends, an
         f.writelines(comparisons)
     print(f" Differences saved to {output_file}")
 
-# MAIN
+
 if __name__ == "__main__":
     os.makedirs('summaries', exist_ok=True)
     os.makedirs('comparisons', exist_ok=True)
